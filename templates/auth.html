@@ -1,0 +1,622 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Nexus — Sign In</title>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  --accent:      #5B3FE8;
+  --accent-dark: #4530C4;
+  --accent-soft: #EEF0FD;
+  --accent-mid:  #DDD9FA;
+  --text:        #18181B;
+  --text-2:      #71717A;
+  --text-3:      #A1A1AA;
+  --border:      #E4E4E7;
+  --border-md:   #D1D1D6;
+  --bg:          #F5F4F0;
+  --white:       #FFFFFF;
+  --error:       #EF4444;
+  --error-bg:    #FEF2F2;
+  --success:     #10B981;
+}
+
+html, body { height: 100%; overflow: hidden; font-family: 'Plus Jakarta Sans', sans-serif; }
+
+body { display: flex; background: var(--bg); }
+
+/* ─── LEFT PANEL ─────────────────────────── */
+.left-panel {
+  width: 480px;
+  flex-shrink: 0;
+  background: var(--accent);
+  background-image:
+    radial-gradient(ellipse at 20% 20%, rgba(255,255,255,0.08) 0%, transparent 50%),
+    radial-gradient(ellipse at 80% 80%, rgba(0,0,0,0.15) 0%, transparent 50%);
+  display: flex;
+  flex-direction: column;
+  padding: 48px;
+  position: relative;
+  overflow: hidden;
+}
+
+/* dot grid texture */
+.left-panel::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background-image: radial-gradient(rgba(255,255,255,0.12) 1px, transparent 1px);
+  background-size: 28px 28px;
+  pointer-events: none;
+}
+
+.brand {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  position: relative;
+  z-index: 1;
+}
+
+/* ─── NEXUS ICON (unique SVG) ─── */
+.nexus-icon {
+  width: 44px;
+  height: 44px;
+  flex-shrink: 0;
+}
+
+.brand-text-wrap { }
+.brand-name {
+  font-size: 22px;
+  font-weight: 800;
+  color: white;
+  letter-spacing: -0.5px;
+  line-height: 1;
+}
+.brand-tagline {
+  font-size: 11px;
+  color: rgba(255,255,255,0.6);
+  font-weight: 500;
+  margin-top: 2px;
+  letter-spacing: 0.5px;
+}
+
+.left-body {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  position: relative;
+  z-index: 1;
+  gap: 36px;
+}
+
+.left-headline {
+  font-size: 34px;
+  font-weight: 800;
+  color: white;
+  letter-spacing: -1px;
+  line-height: 1.2;
+}
+.left-headline span {
+  color: rgba(255,255,255,0.55);
+}
+
+.feature-list {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+.feature-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+}
+.feature-icon {
+  width: 34px;
+  height: 34px;
+  background: rgba(255,255,255,0.12);
+  border-radius: 9px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 16px;
+  flex-shrink: 0;
+  border: 1px solid rgba(255,255,255,0.15);
+}
+.feature-info-title {
+  font-size: 13.5px;
+  font-weight: 700;
+  color: white;
+}
+.feature-info-sub {
+  font-size: 12px;
+  color: rgba(255,255,255,0.55);
+  margin-top: 1px;
+}
+
+.left-quote {
+  background: rgba(255,255,255,0.1);
+  border: 1px solid rgba(255,255,255,0.15);
+  border-radius: 12px;
+  padding: 18px 20px;
+}
+.left-quote p {
+  font-size: 13px;
+  color: rgba(255,255,255,0.8);
+  line-height: 1.6;
+  font-style: italic;
+}
+.left-quote-author {
+  font-size: 11px;
+  color: rgba(255,255,255,0.45);
+  margin-top: 8px;
+  font-weight: 600;
+}
+
+.left-footer {
+  position: relative;
+  z-index: 1;
+  font-size: 11px;
+  color: rgba(255,255,255,0.4);
+}
+
+/* ─── RIGHT PANEL ─────────────────────────── */
+.right-panel {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 40px 24px;
+  overflow-y: auto;
+}
+
+.auth-card {
+  width: 100%;
+  max-width: 420px;
+}
+
+.auth-tabs {
+  display: flex;
+  background: var(--bg);
+  border: 1.5px solid var(--border);
+  border-radius: 10px;
+  padding: 4px;
+  margin-bottom: 28px;
+}
+.auth-tab {
+  flex: 1;
+  padding: 9px;
+  border: none;
+  border-radius: 7px;
+  background: transparent;
+  font-family: 'Plus Jakarta Sans', sans-serif;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text-3);
+  cursor: pointer;
+  transition: all 0.2s;
+}
+.auth-tab.active {
+  background: var(--white);
+  color: var(--text);
+  box-shadow: 0 1px 4px rgba(0,0,0,0.1);
+}
+
+.auth-heading { font-size: 24px; font-weight: 800; color: var(--text); letter-spacing: -0.5px; }
+.auth-sub { font-size: 14px; color: var(--text-2); margin-top: 6px; margin-bottom: 28px; }
+
+/* form */
+.form-group { margin-bottom: 16px; }
+.form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+
+label {
+  display: block;
+  font-size: 12.5px;
+  font-weight: 600;
+  color: var(--text);
+  margin-bottom: 6px;
+}
+
+.input-field {
+  width: 100%;
+  padding: 10px 14px;
+  border: 1.5px solid var(--border-md);
+  border-radius: 9px;
+  font-family: 'Plus Jakarta Sans', sans-serif;
+  font-size: 14px;
+  color: var(--text);
+  background: var(--white);
+  outline: none;
+  transition: all 0.15s;
+}
+.input-field::placeholder { color: var(--text-3); }
+.input-field:focus {
+  border-color: var(--accent);
+  box-shadow: 0 0 0 3px var(--accent-mid);
+}
+.input-field.error { border-color: var(--error); }
+.input-field.error:focus { box-shadow: 0 0 0 3px #FEE2E2; }
+
+.field-hint { font-size: 11px; color: var(--text-3); margin-top: 4px; }
+
+.password-wrap { position: relative; }
+.password-toggle {
+  position: absolute;
+  right: 12px; top: 50%;
+  transform: translateY(-50%);
+  background: none; border: none; cursor: pointer;
+  color: var(--text-3); font-size: 16px;
+  transition: color 0.15s;
+}
+.password-toggle:hover { color: var(--text-2); }
+
+.divider {
+  display: flex; align-items: center; gap: 12px;
+  margin: 20px 0;
+  font-size: 12px; color: var(--text-3); font-weight: 600;
+}
+.divider::before, .divider::after {
+  content: ''; flex: 1; height: 1px; background: var(--border);
+}
+
+.google-btn {
+  width: 100%;
+  display: flex; align-items: center; justify-content: center; gap: 10px;
+  padding: 11px;
+  border: 1.5px solid var(--border-md);
+  border-radius: 9px;
+  background: var(--white);
+  font-family: 'Plus Jakarta Sans', sans-serif;
+  font-size: 13.5px;
+  font-weight: 600;
+  color: var(--text);
+  cursor: pointer;
+  transition: all 0.15s;
+}
+.google-btn:hover { background: var(--bg); border-color: var(--border-md); }
+.google-logo { width: 18px; height: 18px; }
+
+.submit-btn {
+  width: 100%;
+  padding: 12px;
+  border: none;
+  border-radius: 9px;
+  background: var(--accent);
+  color: white;
+  font-family: 'Plus Jakarta Sans', sans-serif;
+  font-size: 14px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.15s;
+  margin-top: 8px;
+  box-shadow: 0 2px 8px rgba(91,63,232,0.35);
+  display: flex; align-items: center; justify-content: center; gap: 8px;
+}
+.submit-btn:hover { background: var(--accent-dark); box-shadow: 0 4px 14px rgba(91,63,232,0.45); transform: translateY(-1px); }
+.submit-btn:active { transform: translateY(0); }
+.submit-btn:disabled { opacity: 0.6; cursor: not-allowed; transform: none; }
+
+.spinner {
+  width: 16px; height: 16px;
+  border: 2px solid rgba(255,255,255,0.3);
+  border-top-color: white;
+  border-radius: 50%;
+  animation: spin 0.7s linear infinite;
+}
+@keyframes spin { to { transform: rotate(360deg); } }
+
+.error-msg {
+  background: var(--error-bg);
+  border: 1.5px solid #FECACA;
+  border-radius: 8px;
+  padding: 10px 12px;
+  font-size: 13px;
+  color: var(--error);
+  font-weight: 500;
+  margin-top: 12px;
+  display: none;
+}
+.error-msg.show { display: block; }
+
+.auth-footer {
+  text-align: center;
+  font-size: 12px;
+  color: var(--text-3);
+  margin-top: 20px;
+}
+.auth-footer a { color: var(--accent); font-weight: 600; text-decoration: none; cursor: pointer; }
+.auth-footer a:hover { text-decoration: underline; }
+
+/* Demo badge */
+.demo-banner {
+  background: #FFFBEB;
+  border: 1.5px solid #FDE68A;
+  border-radius: 9px;
+  padding: 10px 14px;
+  margin-bottom: 20px;
+  display: flex; align-items: center; gap: 8px;
+}
+.demo-banner-text { font-size: 12px; color: #92400E; }
+.demo-banner-text strong { font-weight: 700; }
+
+/* responsive */
+@media (max-width: 760px) {
+  .left-panel { display: none; }
+}
+</style>
+</head>
+<body>
+
+<!-- LEFT PANEL -->
+<div class="left-panel">
+  <div class="brand">
+    <!-- Unique Nexus SVG icon: a hub with routing lines -->
+    <svg class="nexus-icon" viewBox="0 0 44 44" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <rect width="44" height="44" rx="12" fill="rgba(255,255,255,0.15)"/>
+      <!-- center hub -->
+      <circle cx="22" cy="22" r="4" fill="white"/>
+      <!-- routing arms -->
+      <line x1="22" y1="18" x2="22" y2="10" stroke="rgba(255,255,255,0.7)" stroke-width="1.8" stroke-linecap="round"/>
+      <line x1="25.46" y1="23.5" x2="32" y2="27.5" stroke="rgba(255,255,255,0.7)" stroke-width="1.8" stroke-linecap="round"/>
+      <line x1="18.54" y1="23.5" x2="12" y2="27.5" stroke="rgba(255,255,255,0.7)" stroke-width="1.8" stroke-linecap="round"/>
+      <!-- end nodes -->
+      <circle cx="22" cy="9" r="2.5" fill="rgba(255,255,255,0.9)"/>
+      <circle cx="33" cy="28" r="2.5" fill="rgba(255,255,255,0.9)"/>
+      <circle cx="11" cy="28" r="2.5" fill="rgba(255,255,255,0.9)"/>
+    </svg>
+    <div class="brand-text-wrap">
+      <div class="brand-name">Nexus</div>
+      <div class="brand-tagline">MULTI-LLM ROUTER</div>
+    </div>
+  </div>
+
+  <div class="left-body">
+    <div class="left-headline">
+      One interface.<br>
+      <span>Every AI model.</span>
+    </div>
+
+    <div class="feature-list">
+      <div class="feature-item">
+        <div class="feature-icon">⚡</div>
+        <div>
+          <div class="feature-info-title">Adaptive Routing</div>
+          <div class="feature-info-sub">Automatically picks the best model for your query type</div>
+        </div>
+      </div>
+      <div class="feature-item">
+        <div class="feature-icon">⚔️</div>
+        <div>
+          <div class="feature-info-title">Arena Mode</div>
+          <div class="feature-info-sub">Compare responses from all models side by side</div>
+        </div>
+      </div>
+      <div class="feature-item">
+        <div class="feature-icon">🎯</div>
+        <div>
+          <div class="feature-info-title">Intent Detection</div>
+          <div class="feature-info-sub">Classifies code, math, creative, analytical queries instantly</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="left-quote">
+      <p>"The right model for the right task — routed intelligently, every time."</p>
+      <div class="left-quote-author">— Nexus Minor Project · B.Tech CSE</div>
+    </div>
+  </div>
+
+  <div class="left-footer">© 2025 Nexus · All rights reserved</div>
+</div>
+
+<!-- RIGHT PANEL -->
+<div class="right-panel">
+  <div class="auth-card">
+
+    <div class="demo-banner">
+      <span>💡</span>
+      <div class="demo-banner-text">
+        <strong>Demo mode:</strong> Any email & password works. Just fill & submit.
+      </div>
+    </div>
+
+    <!-- Tabs -->
+    <div class="auth-tabs">
+      <button class="auth-tab active" id="tab-login" onclick="switchTab('login')">Sign In</button>
+      <button class="auth-tab" id="tab-signup" onclick="switchTab('signup')">Create Account</button>
+    </div>
+
+    <!-- LOGIN FORM -->
+    <div id="form-login">
+      <div class="auth-heading">Welcome back</div>
+      <div class="auth-sub">Sign in to continue to Nexus</div>
+
+      <div class="divider">or continue with email</div>
+
+      <button class="google-btn" type="button">
+        <svg class="google-logo" viewBox="0 0 24 24">
+          <path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4"/>
+          <path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"/>
+          <path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z" fill="#FBBC05"/>
+          <path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335"/>
+        </svg>
+        Continue with Google
+      </button>
+
+      <div class="divider">or</div>
+
+      <div class="form-group">
+        <label>Email address</label>
+        <input type="email" class="input-field" id="login-email" placeholder="you@example.com" autocomplete="email"/>
+      </div>
+      <div class="form-group">
+        <label>Password</label>
+        <div class="password-wrap">
+          <input type="password" class="input-field" id="login-password" placeholder="Enter your password" autocomplete="current-password"/>
+          <button class="password-toggle" type="button" onclick="togglePwd('login-password', this)">👁</button>
+        </div>
+      </div>
+
+      <div id="login-error" class="error-msg">Invalid email or password. Please try again.</div>
+
+      <button class="submit-btn" id="login-btn" onclick="doLogin()">
+        Sign In
+      </button>
+
+      <div class="auth-footer">
+        Don't have an account? <a onclick="switchTab('signup')">Create one →</a>
+      </div>
+    </div>
+
+    <!-- SIGNUP FORM -->
+    <div id="form-signup" style="display:none">
+      <div class="auth-heading">Create your account</div>
+      <div class="auth-sub">Start routing AI models intelligently</div>
+
+      <button class="google-btn" type="button" style="margin-bottom:16px">
+        <svg class="google-logo" viewBox="0 0 24 24">
+          <path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4"/>
+          <path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"/>
+          <path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z" fill="#FBBC05"/>
+          <path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335"/>
+        </svg>
+        Sign up with Google
+      </button>
+
+      <div class="divider">or</div>
+
+      <div class="form-row">
+        <div class="form-group">
+          <label>First name</label>
+          <input type="text" class="input-field" id="signup-first" placeholder="Alka"/>
+        </div>
+        <div class="form-group">
+          <label>Last name</label>
+          <input type="text" class="input-field" id="signup-last" placeholder="Singh"/>
+        </div>
+      </div>
+      <div class="form-group">
+        <label>Email address</label>
+        <input type="email" class="input-field" id="signup-email" placeholder="you@example.com"/>
+      </div>
+      <div class="form-group">
+        <label>Password</label>
+        <div class="password-wrap">
+          <input type="password" class="input-field" id="signup-password" placeholder="Min. 6 characters"/>
+          <button class="password-toggle" type="button" onclick="togglePwd('signup-password', this)">👁</button>
+        </div>
+        <div class="field-hint">Must be at least 6 characters</div>
+      </div>
+
+      <div id="signup-error" class="error-msg">Please fill in all fields correctly.</div>
+
+      <button class="submit-btn" id="signup-btn" onclick="doSignup()">
+        Create Account
+      </button>
+
+      <div class="auth-footer">
+        Already have an account? <a onclick="switchTab('login')">Sign in →</a>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<script>
+function switchTab(tab) {
+  document.getElementById('tab-login').classList.toggle('active', tab === 'login');
+  document.getElementById('tab-signup').classList.toggle('active', tab === 'signup');
+  document.getElementById('form-login').style.display = tab === 'login' ? 'block' : 'none';
+  document.getElementById('form-signup').style.display = tab === 'signup' ? 'block' : 'none';
+}
+
+function togglePwd(id, btn) {
+  const inp = document.getElementById(id);
+  inp.type = inp.type === 'password' ? 'text' : 'password';
+  btn.textContent = inp.type === 'password' ? '👁' : '🙈';
+}
+
+async function doLogin() {
+  const email = document.getElementById('login-email').value.trim();
+  const password = document.getElementById('login-password').value;
+  const errEl = document.getElementById('login-error');
+  const btn = document.getElementById('login-btn');
+
+  if (!email || !password) {
+    errEl.textContent = 'Please enter your email and password.';
+    errEl.classList.add('show'); return;
+  }
+
+  btn.disabled = true;
+  btn.innerHTML = '<div class="spinner"></div> Signing in...';
+  errEl.classList.remove('show');
+
+  const res = await fetch('/auth/login', {
+    method: 'POST',
+    headers: {'Content-Type':'application/json'},
+    body: JSON.stringify({email, password})
+  });
+  const data = await res.json();
+
+  if (data.ok) {
+    btn.innerHTML = '✓ Done! Redirecting...';
+    window.location.href = '/chat';
+  } else {
+    btn.disabled = false;
+    btn.innerHTML = 'Sign In';
+    errEl.textContent = data.error || 'Invalid credentials.';
+    errEl.classList.add('show');
+  }
+}
+
+async function doSignup() {
+  const first = document.getElementById('signup-first').value.trim();
+  const last = document.getElementById('signup-last').value.trim();
+  const email = document.getElementById('signup-email').value.trim();
+  const password = document.getElementById('signup-password').value;
+  const errEl = document.getElementById('signup-error');
+  const btn = document.getElementById('signup-btn');
+
+  if (!first || !email || password.length < 6) {
+    errEl.textContent = !first ? 'Please enter your first name.' :
+                        !email ? 'Please enter your email.' :
+                        'Password must be at least 6 characters.';
+    errEl.classList.add('show'); return;
+  }
+
+  btn.disabled = true;
+  btn.innerHTML = '<div class="spinner"></div> Creating account...';
+  errEl.classList.remove('show');
+
+  const res = await fetch('/auth/signup', {
+    method: 'POST',
+    headers: {'Content-Type':'application/json'},
+    body: JSON.stringify({first, last, email, password})
+  });
+  const data = await res.json();
+
+  if (data.ok) {
+    btn.innerHTML = '✓ Done! Redirecting...';
+    window.location.href = '/chat';
+  } else {
+    btn.disabled = false;
+    btn.innerHTML = 'Create Account';
+    errEl.textContent = data.error || 'Something went wrong.';
+    errEl.classList.add('show');
+  }
+}
+
+// Enter key
+document.addEventListener('keydown', e => {
+  if (e.key !== 'Enter') return;
+  const loginVisible = document.getElementById('form-login').style.display !== 'none';
+  if (loginVisible) doLogin(); else doSignup();
+});
+</script>
+</body>
+</html>
