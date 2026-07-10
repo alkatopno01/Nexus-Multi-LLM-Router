@@ -1,0 +1,1123 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Nexus — Chat</title>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=Fira+Code:wght@400;500&display=swap" rel="stylesheet">
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  --bg:          #F5F4F0;
+  --sidebar:     #FFFFFF;
+  --white:       #FFFFFF;
+  --border:      #E4E4E7;
+  --border-md:   #D1D1D6;
+  --accent:      #5B3FE8;
+  --accent-dark: #4530C4;
+  --accent-soft: #EEF0FD;
+  --accent-mid:  #DDD9FA;
+  --text:        #18181B;
+  --text-2:      #71717A;
+  --text-3:      #A1A1AA;
+  --code-bg:     #F4F3EF;
+  --user-bg:     #5B3FE8;
+  --shadow-sm:   0 1px 3px rgba(0,0,0,0.07), 0 1px 2px rgba(0,0,0,0.04);
+  --shadow-md:   0 4px 12px rgba(0,0,0,0.08), 0 2px 4px rgba(0,0,0,0.05);
+  --radius:      12px;
+  --radius-sm:   8px;
+}
+
+html, body { height: 100%; overflow: hidden; }
+body { font-family: 'Plus Jakarta Sans', sans-serif; background: var(--bg); color: var(--text); display: flex; font-size: 14px; }
+
+::-webkit-scrollbar { width: 4px; height: 4px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: var(--border-md); border-radius: 10px; }
+
+/* ═══════════ SIDEBAR ════════════════════════════════════ */
+.sidebar {
+  width: 256px;
+  flex-shrink: 0;
+  background: var(--sidebar);
+  border-right: 1px solid var(--border);
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+}
+
+/* logo */
+.sidebar-logo {
+  display: flex;
+  align-items: center;
+  gap: 11px;
+  padding: 18px 18px 16px;
+  border-bottom: 1px solid var(--border);
+  flex-shrink: 0;
+}
+
+/* Nexus SVG Icon */
+.nexus-svg { width: 36px; height: 36px; flex-shrink: 0; }
+
+.logo-words { }
+.logo-name { font-size: 17px; font-weight: 800; color: var(--text); letter-spacing: -0.4px; }
+.logo-sub  { font-size: 10px; color: var(--text-3); font-weight: 500; letter-spacing: 0.5px; margin-top: 1px; }
+
+/* new chat btn */
+.new-chat-btn {
+  margin: 14px 14px 4px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 7px;
+  padding: 10px;
+  border-radius: var(--radius-sm);
+  border: 1.5px solid var(--border);
+  background: transparent;
+  font-family: 'Plus Jakarta Sans', sans-serif;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text-2);
+  cursor: pointer;
+  transition: all 0.15s;
+  flex-shrink: 0;
+}
+.new-chat-btn:hover { border-color: var(--accent); color: var(--accent); background: var(--accent-soft); }
+.new-chat-btn svg { width: 14px; height: 14px; }
+
+/* section label */
+.sec-label {
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.8px;
+  color: var(--text-3);
+  text-transform: uppercase;
+  padding: 12px 18px 6px;
+  flex-shrink: 0;
+}
+
+/* modes */
+.mode-list {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  padding: 0 10px;
+  flex-shrink: 0;
+}
+
+.mode-btn {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 9px 10px;
+  border-radius: var(--radius-sm);
+  border: none;
+  background: transparent;
+  cursor: pointer;
+  font-family: 'Plus Jakarta Sans', sans-serif;
+  width: 100%;
+  text-align: left;
+  transition: all 0.15s;
+}
+.mode-btn:hover { background: var(--bg); }
+.mode-btn.active { background: var(--accent-soft); }
+
+.mode-icon-wrap {
+  width: 30px; height: 30px;
+  border-radius: 7px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 15px;
+  background: var(--bg);
+  border: 1px solid var(--border);
+  flex-shrink: 0;
+  transition: all 0.15s;
+}
+.mode-btn.active .mode-icon-wrap {
+  background: var(--accent);
+  border-color: var(--accent);
+}
+.mode-btn.active .mode-icon-wrap .mi { filter: grayscale(0) brightness(10); }
+
+.mode-text-wrap { }
+.mode-name { font-size: 13px; font-weight: 600; color: var(--text); }
+.mode-desc { font-size: 11px; color: var(--text-3); }
+.mode-btn.active .mode-name { color: var(--accent); }
+
+/* history */
+.sidebar-scroll {
+  flex: 1;
+  overflow-y: auto;
+  padding: 0 10px 10px;
+}
+
+.history-item {
+  padding: 9px 10px;
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  transition: background 0.15s;
+  border: 1px solid transparent;
+  margin-bottom: 2px;
+}
+.history-item:hover { background: var(--bg); border-color: var(--border); }
+.history-q {
+  font-size: 12.5px;
+  font-weight: 500;
+  color: var(--text);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  margin-bottom: 4px;
+}
+.history-tags { display: flex; gap: 5px; align-items: center; }
+.htag {
+  font-size: 10px;
+  font-weight: 700;
+  padding: 2px 7px;
+  border-radius: 10px;
+}
+.htime { font-size: 10px; color: var(--text-3); margin-left: auto; }
+
+.empty-history { font-size: 12px; color: var(--text-3); padding: 8px 10px; }
+
+/* sidebar footer */
+.sidebar-footer {
+  padding: 12px 14px;
+  border-top: 1px solid var(--border);
+  flex-shrink: 0;
+}
+.user-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 8px 10px;
+  border-radius: var(--radius-sm);
+  background: var(--bg);
+  border: 1px solid var(--border);
+  cursor: pointer;
+  transition: all 0.15s;
+  text-decoration: none;
+}
+.user-row:hover { border-color: var(--border-md); }
+.user-avatar {
+  width: 30px; height: 30px;
+  border-radius: 8px;
+  background: var(--accent);
+  color: white;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 13px;
+  font-weight: 700;
+  flex-shrink: 0;
+}
+.user-info { flex: 1; min-width: 0; }
+.user-name { font-size: 12.5px; font-weight: 600; color: var(--text); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.user-email { font-size: 10px; color: var(--text-3); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.logout-icon { font-size: 14px; color: var(--text-3); }
+
+/* ═══════════ MAIN ════════════════════════════════════ */
+.main { flex: 1; display: flex; flex-direction: column; height: 100vh; min-width: 0; }
+
+/* topbar */
+.topbar {
+  height: 54px;
+  display: flex;
+  align-items: center;
+  padding: 0 24px;
+  border-bottom: 1px solid var(--border);
+  background: var(--white);
+  gap: 14px;
+  flex-shrink: 0;
+}
+.topbar-mode-pill {
+  display: flex; align-items: center; gap: 6px;
+  padding: 5px 12px;
+  border-radius: 20px;
+  background: var(--accent-soft);
+  border: 1px solid var(--accent-mid);
+}
+.topbar-mode-dot { width: 6px; height: 6px; border-radius: 50%; background: var(--accent); }
+.topbar-mode-lbl { font-size: 12px; font-weight: 700; color: var(--accent); }
+
+.topbar-sep { flex: 1; }
+
+.topbar-stats { display: flex; align-items: center; gap: 20px; }
+.tstat { display: flex; flex-direction: column; align-items: flex-end; }
+.tstat-val { font-size: 13px; font-weight: 700; color: var(--text); font-family: 'Fira Code', monospace; }
+.tstat-key { font-size: 10px; color: var(--text-3); font-weight: 500; }
+
+/* chat */
+.chat-area { flex: 1; overflow-y: auto; padding: 28px 0; scroll-behavior: smooth; }
+.chat-inner { max-width: 740px; margin: 0 auto; padding: 0 24px; display: flex; flex-direction: column; gap: 6px; }
+
+/* welcome */
+.welcome {
+  display: flex; flex-direction: column; align-items: center; justify-content: center;
+  gap: 22px; min-height: calc(100vh - 200px); text-align: center;
+  animation: fade-up 0.5s ease-out;
+}
+@keyframes fade-up { from { opacity:0; transform:translateY(14px); } to { opacity:1; transform:translateY(0); } }
+
+.welcome-logo {
+  width: 62px; height: 62px;
+  background: var(--white);
+  border: 2px solid var(--border);
+  border-radius: 18px;
+  display: flex; align-items: center; justify-content: center;
+  box-shadow: var(--shadow-md);
+}
+.welcome-heading { font-size: 27px; font-weight: 800; color: var(--text); letter-spacing: -0.6px; line-height: 1.2; }
+.welcome-heading em { color: var(--accent); font-style: normal; }
+.welcome-body { font-size: 14px; color: var(--text-2); max-width: 380px; line-height: 1.7; }
+
+.prompt-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; width: 100%; max-width: 520px; }
+
+.prompt-card {
+  background: var(--white);
+  border: 1.5px solid var(--border);
+  border-radius: var(--radius);
+  padding: 14px 15px;
+  cursor: pointer;
+  text-align: left;
+  font-family: 'Plus Jakarta Sans', sans-serif;
+  transition: all 0.15s;
+}
+.prompt-card:hover { border-color: var(--accent); box-shadow: var(--shadow-md); transform: translateY(-1px); background: var(--accent-soft); }
+.prompt-card-icon { font-size: 20px; margin-bottom: 7px; display: block; }
+.prompt-card-text { font-size: 13px; font-weight: 500; color: var(--text); line-height: 1.4; }
+.prompt-card-sub { font-size: 11px; color: var(--text-3); margin-top: 3px; }
+
+/* routing card */
+.routing-card {
+  background: var(--white);
+  border: 1.5px solid var(--border);
+  border-radius: var(--radius);
+  padding: 14px 16px;
+  box-shadow: var(--shadow-sm);
+  animation: fade-up 0.25s ease-out;
+  position: relative;
+  overflow: hidden;
+  margin-bottom: 4px;
+}
+.routing-card::before {
+  content: '';
+  position: absolute; left: 0; top: 0; bottom: 0;
+  width: 3px; background: var(--accent);
+}
+
+.routing-top { display: flex; align-items: center; gap: 8px; margin-bottom: 12px; padding-left: 8px; flex-wrap: wrap; }
+.routing-lbl { font-size: 10px; font-weight: 700; letter-spacing: 0.7px; color: var(--text-3); text-transform: uppercase; margin-right: 4px; }
+
+.chip {
+  display: inline-flex; align-items: center; gap: 5px;
+  padding: 3px 10px; border-radius: 20px;
+  font-size: 11px; font-weight: 700;
+}
+.chip-intent { border: 1.5px solid currentColor; }
+.chip-winner { background: var(--accent); color: white; }
+.chip-complexity { background: var(--bg); border: 1px solid var(--border); color: var(--text-2); font-family: 'Fira Code', monospace; }
+
+.routing-scores { display: flex; flex-direction: column; gap: 6px; padding-left: 8px; }
+.score-row { display: flex; align-items: center; gap: 8px; }
+.score-model-name { font-size: 11px; font-weight: 600; color: var(--text-2); width: 96px; flex-shrink: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.score-track { flex: 1; height: 5px; background: var(--bg); border-radius: 10px; overflow: hidden; border: 1px solid var(--border); }
+.score-fill { height: 100%; border-radius: 10px; width: 0; transition: width 0.9s cubic-bezier(0.22,1,0.36,1); }
+.score-pct { font-size: 11px; font-weight: 700; color: var(--text-2); width: 34px; text-align: right; font-family: 'Fira Code', monospace; flex-shrink: 0; }
+.score-crown { font-size: 12px; flex-shrink: 0; width: 18px; }
+
+.routing-reason {
+  font-size: 12.5px; color: var(--text-2); margin-top: 10px;
+  padding: 8px 12px; background: var(--bg); border-radius: 8px;
+  line-height: 1.55; padding-left: 18px;
+}
+
+/* messages */
+.message { display: flex; gap: 11px; animation: fade-up 0.25s ease-out; }
+.message.user { flex-direction: row-reverse; }
+.message + .message { margin-top: 4px; }
+.message-group { margin-top: 18px; display: flex; flex-direction: column; gap: 4px; }
+
+/* ─── MODEL AVATAR (shown next to AI messages) ─── */
+.model-avatar {
+  width: 32px; height: 32px;
+  border-radius: 9px;
+  display: flex; align-items: center; justify-content: center;
+  flex-shrink: 0;
+  margin-top: 2px;
+  border: 1.5px solid;
+  overflow: hidden;
+}
+.model-avatar svg { width: 18px; height: 18px; }
+
+.user-avatar-msg {
+  width: 32px; height: 32px;
+  border-radius: 9px;
+  background: var(--user-bg);
+  color: white;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 13px; font-weight: 700;
+  flex-shrink: 0;
+  margin-top: 2px;
+}
+
+.msg-body { max-width: 78%; display: flex; flex-direction: column; gap: 4px; }
+.message.user .msg-body { align-items: flex-end; }
+
+.msg-meta { display: flex; align-items: center; gap: 7px; margin-bottom: 2px; }
+.msg-model-lbl { font-size: 12px; font-weight: 700; }
+.msg-time { font-size: 10px; color: var(--text-3); }
+.msg-lat {
+  font-size: 10px; color: var(--text-3);
+  font-family: 'Fira Code', monospace;
+  padding: 1px 6px; border-radius: 4px;
+  background: var(--bg); border: 1px solid var(--border);
+}
+
+.bubble {
+  padding: 12px 16px;
+  border-radius: 14px;
+  font-size: 14px;
+  line-height: 1.7;
+  color: var(--text);
+}
+.message.user .bubble {
+  background: var(--user-bg);
+  color: white;
+  border-radius: 14px 4px 14px 14px;
+}
+.message.assistant .bubble {
+  background: var(--white);
+  border: 1.5px solid var(--border);
+  border-radius: 4px 14px 14px 14px;
+  box-shadow: var(--shadow-sm);
+}
+
+.bubble.streaming::after {
+  content: '';
+  display: inline-block;
+  width: 2px; height: 14px;
+  background: var(--accent);
+  margin-left: 3px;
+  vertical-align: middle;
+  border-radius: 1px;
+  animation: blink 0.8s infinite;
+}
+@keyframes blink { 0%,100%{opacity:1} 50%{opacity:0} }
+
+.bubble pre {
+  background: var(--code-bg);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 14px;
+  margin: 10px 0;
+  overflow-x: auto;
+  font-family: 'Fira Code', monospace;
+  font-size: 12.5px;
+  line-height: 1.6;
+  position: relative;
+}
+.message.user .bubble pre { background: rgba(255,255,255,0.15); border-color: rgba(255,255,255,0.2); color: white; }
+
+.copy-code-btn {
+  position: absolute; top: 8px; right: 8px;
+  padding: 3px 9px; border-radius: 5px;
+  border: 1px solid var(--border-md);
+  background: var(--white); cursor: pointer;
+  font-size: 10px; font-weight: 600; color: var(--text-2);
+  font-family: 'Plus Jakarta Sans', sans-serif;
+  opacity: 0; transition: opacity 0.2s;
+}
+pre:hover .copy-code-btn { opacity: 1; }
+
+.bubble code {
+  font-family: 'Fira Code', monospace;
+  font-size: 12.5px;
+  background: var(--code-bg);
+  padding: 1px 6px;
+  border-radius: 4px;
+  border: 1px solid var(--border);
+  color: var(--accent);
+}
+.message.user .bubble code { background: rgba(255,255,255,0.2); border-color: rgba(255,255,255,0.2); color: white; }
+.bubble strong { font-weight: 700; }
+
+/* typing */
+.typing-dots { display: flex; gap: 4px; align-items: center; padding: 6px 0; }
+.typing-dots span {
+  width: 6px; height: 6px; border-radius: 50%;
+  background: var(--text-3);
+  animation: tdot 1.2s infinite ease-in-out;
+}
+.typing-dots span:nth-child(2) { animation-delay: 0.15s; }
+.typing-dots span:nth-child(3) { animation-delay: 0.3s; }
+@keyframes tdot { 0%,100%{transform:translateY(0);opacity:0.4} 50%{transform:translateY(-4px);opacity:1} }
+
+/* arena */
+.arena-wrap { display: flex; flex-direction: column; gap: 8px; }
+.arena-header { font-size: 11px; font-weight: 700; color: var(--text-3); letter-spacing: 0.5px; text-transform: uppercase; }
+.arena-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 10px; }
+
+.arena-card {
+  background: var(--white);
+  border: 1.5px solid var(--border);
+  border-radius: var(--radius);
+  overflow: hidden;
+  box-shadow: var(--shadow-sm);
+  transition: all 0.2s;
+}
+.arena-card:hover { border-color: var(--accent-mid); box-shadow: var(--shadow-md); }
+.arena-card-head {
+  display: flex; align-items: center; gap: 8px;
+  padding: 10px 14px;
+  border-bottom: 1px solid var(--border);
+  background: var(--bg);
+}
+.arena-card-name { font-size: 13px; font-weight: 700; flex: 1; }
+.arena-card-lat {
+  font-size: 10px; color: var(--text-3);
+  font-family: 'Fira Code', monospace;
+  padding: 2px 7px; background: var(--white);
+  border: 1px solid var(--border); border-radius: 10px;
+}
+.arena-card-body {
+  padding: 14px; font-size: 13px; line-height: 1.65;
+  color: var(--text); max-height: 200px; overflow-y: auto; white-space: pre-wrap;
+}
+
+.vote-row {
+  display: flex; align-items: center; gap: 8px;
+  padding: 12px 16px;
+  background: var(--white);
+  border: 1.5px solid var(--border);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow-sm);
+}
+.vote-lbl { font-size: 12px; font-weight: 600; color: var(--text-2); flex-shrink: 0; }
+.vote-btns { display: flex; gap: 6px; flex-wrap: wrap; }
+.vote-btn {
+  padding: 5px 12px; border-radius: 20px;
+  border: 1.5px solid var(--border); background: transparent;
+  cursor: pointer; font-size: 11px; font-weight: 600; color: var(--text-2);
+  transition: all 0.15s; font-family: 'Plus Jakarta Sans', sans-serif;
+}
+.vote-btn:hover { border-color: var(--accent); color: var(--accent); background: var(--accent-soft); }
+.vote-btn.voted { background: var(--accent); border-color: var(--accent); color: white; }
+
+/* ═══════════ INPUT ════════════════════════════════════ */
+.input-area { padding: 14px 24px 18px; background: var(--bg); flex-shrink: 0; }
+.input-box {
+  max-width: 740px; margin: 0 auto;
+  background: var(--white);
+  border: 1.5px solid var(--border-md);
+  border-radius: 16px;
+  box-shadow: var(--shadow-md);
+  transition: border-color 0.2s, box-shadow 0.2s;
+}
+.input-box:focus-within {
+  border-color: var(--accent);
+  box-shadow: 0 0 0 3px var(--accent-mid), var(--shadow-md);
+}
+
+.input-top { display: flex; align-items: flex-end; padding: 13px 13px 9px; gap: 9px; }
+
+#query-input {
+  flex: 1; border: none; outline: none;
+  font-family: 'Plus Jakarta Sans', sans-serif;
+  font-size: 14.5px; color: var(--text);
+  background: transparent; resize: none;
+  line-height: 1.5; max-height: 130px; min-height: 24px;
+}
+#query-input::placeholder { color: var(--text-3); }
+
+.send-btn {
+  width: 36px; height: 36px;
+  border-radius: 10px; border: none;
+  background: var(--accent); color: white;
+  cursor: pointer; display: flex; align-items: center; justify-content: center;
+  flex-shrink: 0; transition: all 0.15s;
+  box-shadow: 0 2px 6px rgba(91,63,232,0.3);
+}
+.send-btn:hover { transform: scale(1.06); background: var(--accent-dark); }
+.send-btn:disabled { opacity: 0.4; cursor: not-allowed; transform: none; }
+.send-btn svg { width: 15px; height: 15px; }
+
+.input-bottom { display: flex; align-items: center; padding: 0 13px 10px; gap: 4px; }
+.iaction {
+  display: flex; align-items: center; gap: 4px;
+  padding: 4px 8px; border-radius: 6px;
+  cursor: pointer; font-size: 11px; font-weight: 600;
+  color: var(--text-3); transition: all 0.15s;
+  border: none; background: transparent; font-family: 'Plus Jakarta Sans', sans-serif;
+}
+.iaction:hover { color: var(--accent); background: var(--accent-soft); }
+.isep { flex: 1; }
+.ihint { font-size: 11px; color: var(--text-3); display: flex; gap: 10px; }
+kbd {
+  display: inline-flex; align-items: center;
+  padding: 1px 5px; border: 1px solid var(--border-md);
+  border-radius: 4px; font-size: 10px;
+  font-family: 'Fira Code', monospace; color: var(--text-3); background: var(--bg);
+}
+
+/* responsive */
+@media (max-width: 780px) { .sidebar { display: none; } .topbar-stats { display: none; } }
+</style>
+</head>
+<body>
+
+<!-- ═══════════ SIDEBAR ════════════════════════════ -->
+<aside class="sidebar">
+
+  <!-- Logo with unique SVG icon -->
+  <div class="sidebar-logo">
+    <svg class="nexus-svg" viewBox="0 0 36 36" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <rect width="36" height="36" rx="10" fill="#5B3FE8"/>
+      <!-- hub center -->
+      <circle cx="18" cy="18" r="3.5" fill="white"/>
+      <!-- routing arms -->
+      <line x1="18" y1="14.5" x2="18" y2="8" stroke="rgba(255,255,255,0.75)" stroke-width="1.6" stroke-linecap="round"/>
+      <line x1="20.8" y1="19.5" x2="26.5" y2="23" stroke="rgba(255,255,255,0.75)" stroke-width="1.6" stroke-linecap="round"/>
+      <line x1="15.2" y1="19.5" x2="9.5" y2="23" stroke="rgba(255,255,255,0.75)" stroke-width="1.6" stroke-linecap="round"/>
+      <!-- end nodes -->
+      <circle cx="18" cy="7" r="2.2" fill="white"/>
+      <circle cx="27.5" cy="23.5" r="2.2" fill="white"/>
+      <circle cx="8.5" cy="23.5" r="2.2" fill="white"/>
+    </svg>
+    <div class="logo-words">
+      <div class="logo-name">Nexus</div>
+      <div class="logo-sub">MULTI-LLM ROUTER</div>
+    </div>
+  </div>
+
+  <!-- New Chat -->
+  <button class="new-chat-btn" onclick="newChat()">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M12 5v14M5 12h14"/></svg>
+    New conversation
+  </button>
+
+  <!-- Routing Mode -->
+  <div class="sec-label">Routing Mode</div>
+  <div class="mode-list">
+    <button class="mode-btn active" data-mode="smart">
+      <div class="mode-icon-wrap"><span class="mi">⚡</span></div>
+      <div class="mode-text-wrap">
+        <div class="mode-name">Smart</div>
+        <div class="mode-desc">Best capability match</div>
+      </div>
+    </button>
+    <button class="mode-btn" data-mode="speed">
+      <div class="mode-icon-wrap"><span class="mi">🚀</span></div>
+      <div class="mode-text-wrap">
+        <div class="mode-name">Speed</div>
+        <div class="mode-desc">Fastest response</div>
+      </div>
+    </button>
+    <button class="mode-btn" data-mode="budget">
+      <div class="mode-icon-wrap"><span class="mi">💰</span></div>
+      <div class="mode-text-wrap">
+        <div class="mode-name">Budget</div>
+        <div class="mode-desc">Cost optimized</div>
+      </div>
+    </button>
+    <button class="mode-btn" data-mode="arena">
+      <div class="mode-icon-wrap"><span class="mi">⚔️</span></div>
+      <div class="mode-text-wrap">
+        <div class="mode-name">Arena</div>
+        <div class="mode-desc">Compare all models</div>
+      </div>
+    </button>
+  </div>
+
+  <!-- History -->
+  <div class="sec-label" style="margin-top:12px">Recent</div>
+  <div class="sidebar-scroll">
+    <div id="history-list">
+      <div class="empty-history">No conversations yet</div>
+    </div>
+  </div>
+
+  <!-- User footer -->
+  <div class="sidebar-footer">
+    <a class="user-row" href="/logout">
+      <div class="user-avatar" id="user-avatar-init">{{ user.name[0].upper() }}</div>
+      <div class="user-info">
+        <div class="user-name">{{ user.name }}</div>
+        <div class="user-email">{{ user.email }}</div>
+      </div>
+      <span class="logout-icon">↩</span>
+    </a>
+  </div>
+</aside>
+
+<!-- ═══════════ MAIN ════════════════════════════════ -->
+<main class="main">
+
+  <!-- Topbar -->
+  <div class="topbar">
+    <div class="topbar-mode-pill">
+      <div class="topbar-mode-dot"></div>
+      <div class="topbar-mode-lbl" id="topbar-mode-lbl">Smart Routing</div>
+    </div>
+    <div class="topbar-sep"></div>
+    <div class="topbar-stats">
+      <div class="tstat">
+        <div class="tstat-val" id="st-queries">0</div>
+        <div class="tstat-key">Queries</div>
+      </div>
+      <div class="tstat">
+        <div class="tstat-val" id="st-latency">— ms</div>
+        <div class="tstat-key">Avg Latency</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Chat -->
+  <div class="chat-area" id="chat-area">
+    <div class="chat-inner" id="chat-inner">
+      <div class="welcome" id="welcome">
+        <div class="welcome-logo">
+          <!-- Same hub icon, larger -->
+          <svg viewBox="0 0 36 36" width="36" height="36" fill="none">
+            <rect width="36" height="36" rx="10" fill="#5B3FE8"/>
+            <circle cx="18" cy="18" r="3.5" fill="white"/>
+            <line x1="18" y1="14.5" x2="18" y2="8" stroke="rgba(255,255,255,0.75)" stroke-width="1.6" stroke-linecap="round"/>
+            <line x1="20.8" y1="19.5" x2="26.5" y2="23" stroke="rgba(255,255,255,0.75)" stroke-width="1.6" stroke-linecap="round"/>
+            <line x1="15.2" y1="19.5" x2="9.5" y2="23" stroke="rgba(255,255,255,0.75)" stroke-width="1.6" stroke-linecap="round"/>
+            <circle cx="18" cy="7" r="2.2" fill="white"/>
+            <circle cx="27.5" cy="23.5" r="2.2" fill="white"/>
+            <circle cx="8.5" cy="23.5" r="2.2" fill="white"/>
+          </svg>
+        </div>
+        <div>
+          <div class="welcome-heading">Hello, <em>{{ user.name.split()[0] }}</em> 👋</div>
+        </div>
+        <div class="welcome-body">Ask anything. Nexus will analyse your query and route it to the most capable model automatically.</div>
+        <div class="prompt-grid">
+          <button class="prompt-card" onclick="usePrompt('Write a Python function to implement binary search')">
+            <span class="prompt-card-icon">💻</span>
+            <div class="prompt-card-text">Write a binary search in Python</div>
+            <div class="prompt-card-sub">Routes to best coding model</div>
+          </button>
+          <button class="prompt-card" onclick="usePrompt('Analyze the pros and cons of microservices architecture')">
+            <span class="prompt-card-icon">🔬</span>
+            <div class="prompt-card-text">Analyze microservices vs monolith</div>
+            <div class="prompt-card-sub">Routes to analytical model</div>
+          </button>
+          <button class="prompt-card" onclick="usePrompt('Solve: derivative of x³ + 2x² - 5x')">
+            <span class="prompt-card-icon">🧮</span>
+            <div class="prompt-card-text">Solve a calculus problem</div>
+            <div class="prompt-card-sub">Routes to math model</div>
+          </button>
+          <button class="prompt-card" onclick="usePrompt('Write a short story about an AI that learns to paint')">
+            <span class="prompt-card-icon">✍️</span>
+            <div class="prompt-card-text">Write a creative short story</div>
+            <div class="prompt-card-sub">Routes to creative model</div>
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Input -->
+  <div class="input-area">
+    <div class="input-box">
+      <div class="input-top">
+        <textarea id="query-input" rows="1"
+          placeholder="Message Nexus..."
+          onkeydown="handleKey(event)"
+          oninput="autoResize(this)"></textarea>
+        <button class="send-btn" id="send-btn" onclick="submit()">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M22 2L11 13M22 2L15 22l-4-9-9-4 20-7z"/>
+          </svg>
+        </button>
+      </div>
+      <div class="input-bottom">
+        <button class="iaction">📎 Attach</button>
+        <button class="iaction">🎙 Voice</button>
+        <div class="isep"></div>
+        <div class="ihint">
+          <span><kbd>↵</kbd> send</span>
+          <span><kbd>⇧↵</kbd> newline</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</main>
+
+<script>
+// ─── Model config ────────────────────────────────────────────────
+// Distinct SVG icons for each model (shown in message avatars)
+const MODEL_AVATARS = {
+  claude: {
+    // Llama 3.3 70B — flame-inspired icon
+    color: '#5B3FE8', border: '#DDD9FA',
+    svg: `<svg viewBox="0 0 18 18" fill="none"><circle cx="9" cy="9" r="8" fill="#EEF0FD"/><text x="9" y="13" text-anchor="middle" font-size="9" font-weight="800" font-family="Plus Jakarta Sans,sans-serif" fill="#5B3FE8">L3</text></svg>`,
+    label: 'Llama 3.3'
+  },
+  gpt4: {
+    // Mixtral — M letter icon
+    color: '#0D9488', border: '#CCFBF1',
+    svg: `<svg viewBox="0 0 18 18" fill="none"><circle cx="9" cy="9" r="8" fill="#F0FDFB"/><text x="9" y="13" text-anchor="middle" font-size="9" font-weight="800" font-family="Plus Jakarta Sans,sans-serif" fill="#0D9488">Mx</text></svg>`,
+    label: 'Mixtral'
+  },
+  gemini: {
+    // Gemma2 — G letter icon
+    color: '#D97706', border: '#FEF3C7',
+    svg: `<svg viewBox="0 0 18 18" fill="none"><circle cx="9" cy="9" r="8" fill="#FFFBEB"/><text x="9" y="13" text-anchor="middle" font-size="9" font-weight="800" font-family="Plus Jakarta Sans,sans-serif" fill="#D97706">G2</text></svg>`,
+    label: 'Gemma2'
+  },
+  mistral: {
+    // Llama 3.1 8B — lightning fast icon
+    color: '#DB2777', border: '#FCE7F3',
+    svg: `<svg viewBox="0 0 18 18" fill="none"><circle cx="9" cy="9" r="8" fill="#FDF2F8"/><text x="9" y="13" text-anchor="middle" font-size="9" font-weight="800" font-family="Plus Jakarta Sans,sans-serif" fill="#DB2777">L1</text></svg>`,
+    label: 'Llama 8B'
+  },
+  llama: {
+    // Llama 3.3 — open source icon
+    color: '#DC2626', border: '#FEE2E2',
+    svg: `<svg viewBox="0 0 18 18" fill="none"><circle cx="9" cy="9" r="8" fill="#FEF2F2"/><text x="9" y="13" text-anchor="middle" font-size="9" font-weight="800" font-family="Plus Jakarta Sans,sans-serif" fill="#DC2626">Lm</text></svg>`,
+    label: 'Llama'
+  }
+};
+
+const MODEL_NAMES = {
+  claude: 'Llama 3.3 70B', gpt4: 'Mixtral 8x7B',
+  gemini: 'Gemma2 9B', mistral: 'Llama 3.1 8B', llama: 'Llama 3.3'
+};
+
+const INTENT_STYLES = {
+  CODE:          { color:'#0D9488', bg:'#CCFBF1', emoji:'💻' },
+  MATH:          { color:'#D97706', bg:'#FEF3C7', emoji:'🧮' },
+  CREATIVE:      { color:'#7C3AED', bg:'#EDE9FE', emoji:'✍️' },
+  ANALYTICAL:    { color:'#2563EB', bg:'#DBEAFE', emoji:'🔬' },
+  FACTUAL:       { color:'#DB2777', bg:'#FCE7F3', emoji:'📚' },
+  CONVERSATIONAL:{ color:'#16A34A', bg:'#DCFCE7', emoji:'💬' }
+};
+
+const MODE_LABELS = {
+  smart:'Smart Routing', speed:'Speed Mode', budget:'Budget Mode', arena:'Arena Mode'
+};
+
+let currentMode = 'smart';
+let queryCount = 0;
+let totalLatency = 0;
+
+// ─── Mode buttons ─────────────────────────────────────────────────
+document.querySelectorAll('.mode-btn').forEach(btn => {
+  btn.addEventListener('click', () => {
+    document.querySelectorAll('.mode-btn').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    currentMode = btn.dataset.mode;
+    document.getElementById('topbar-mode-lbl').textContent = MODE_LABELS[currentMode];
+  });
+});
+
+// ─── Input helpers ────────────────────────────────────────────────
+function autoResize(el) {
+  el.style.height = 'auto';
+  el.style.height = Math.min(el.scrollHeight, 130) + 'px';
+}
+
+function handleKey(e) {
+  if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); submit(); }
+}
+
+function usePrompt(t) {
+  const inp = document.getElementById('query-input');
+  inp.value = t; autoResize(inp); inp.focus();
+}
+
+function newChat() {
+  document.getElementById('chat-inner').innerHTML = `
+    <div class="welcome" id="welcome">
+      <div class="welcome-logo">
+        <svg viewBox="0 0 36 36" width="36" height="36" fill="none">
+          <rect width="36" height="36" rx="10" fill="#5B3FE8"/>
+          <circle cx="18" cy="18" r="3.5" fill="white"/>
+          <line x1="18" y1="14.5" x2="18" y2="8" stroke="rgba(255,255,255,0.75)" stroke-width="1.6" stroke-linecap="round"/>
+          <line x1="20.8" y1="19.5" x2="26.5" y2="23" stroke="rgba(255,255,255,0.75)" stroke-width="1.6" stroke-linecap="round"/>
+          <line x1="15.2" y1="19.5" x2="9.5" y2="23" stroke="rgba(255,255,255,0.75)" stroke-width="1.6" stroke-linecap="round"/>
+          <circle cx="18" cy="7" r="2.2" fill="white"/>
+          <circle cx="27.5" cy="23.5" r="2.2" fill="white"/>
+          <circle cx="8.5" cy="23.5" r="2.2" fill="white"/>
+        </svg>
+      </div>
+      <div class="welcome-heading">Start a new conversation</div>
+      <div class="welcome-body">Ask anything — Nexus routes automatically.</div>
+    </div>`;
+}
+
+// ─── Submit ───────────────────────────────────────────────────────
+async function submit() {
+  const inp = document.getElementById('query-input');
+  const query = inp.value.trim();
+  if (!query) return;
+  inp.value = ''; autoResize(inp);
+  document.getElementById('send-btn').disabled = true;
+
+  const welcome = document.getElementById('welcome');
+  if (welcome) welcome.remove();
+
+  appendUserMsg(query);
+
+  const data = await analyzeQuery(query);
+  insertRoutingCard(data);
+
+  if (currentMode === 'arena') {
+    await runArena(query, data);
+  } else {
+    await runSingle(query, data);
+  }
+
+  document.getElementById('send-btn').disabled = false;
+  queryCount++;
+  document.getElementById('st-queries').textContent = queryCount;
+  addHistory(query, data);
+}
+
+// ─── Analyze ──────────────────────────────────────────────────────
+async function analyzeQuery(query) {
+  const res = await fetch('/api/analyze', {
+    method:'POST', headers:{'Content-Type':'application/json'},
+    body: JSON.stringify({query, mode: currentMode})
+  });
+  return res.json();
+}
+
+// ─── Routing card ─────────────────────────────────────────────────
+function insertRoutingCard(data) {
+  const intent  = data.intent;
+  const routing = data.routing;
+  const scores  = routing.scores;
+  const ist     = INTENT_STYLES[intent.primary] || INTENT_STYLES.CONVERSATIONAL;
+  const winner  = routing.winner;
+  const sorted  = Object.keys(scores).sort((a,b) => scores[b]-scores[a]);
+
+  const card = document.createElement('div');
+  card.className = 'routing-card';
+  card.innerHTML = `
+    <div class="routing-top">
+      <span class="routing-lbl">Routing Decision</span>
+      <span class="chip chip-intent" style="color:${ist.color};background:${ist.bg}">${ist.emoji} ${intent.primary}</span>
+      <span class="chip chip-winner">${MODEL_AVATARS[winner]?.svg ?? ''} ${MODEL_NAMES[winner]}</span>
+      <span class="chip chip-complexity">⚡ ${intent.complexity}</span>
+    </div>
+    <div class="routing-scores">
+      ${sorted.map(id => {
+        const sc  = scores[id];
+        const col = MODEL_AVATARS[id]?.color || '#5B3FE8';
+        return `<div class="score-row">
+          <div class="score-model-name">${MODEL_AVATARS[id]?.svg ?? ''}  ${MODEL_AVATARS[id]?.label ?? id}</div>
+          <div class="score-track">
+            <div class="score-fill" data-w="${sc}" style="background:${col}"></div>
+          </div>
+          <div class="score-pct">${sc}%</div>
+          <div class="score-crown">${id===winner?'👑':''}</div>
+        </div>`;
+      }).join('')}
+    </div>
+    <div class="routing-reason">${routing.reasoning}</div>`;
+
+  appendToChat(card);
+
+  // Animate bars
+  requestAnimationFrame(() => {
+    card.querySelectorAll('.score-fill').forEach(bar => {
+      bar.style.width = bar.dataset.w + '%';
+    });
+  });
+}
+
+// ─── Single mode ──────────────────────────────────────────────────
+async function runSingle(query, data) {
+  const winner  = data.routing.winner;
+  const av      = MODEL_AVATARS[winner];
+  const t0      = Date.now();
+
+  const msgEl = document.createElement('div');
+  msgEl.className = 'message assistant';
+  msgEl.innerHTML = `
+    <div class="model-avatar" style="border-color:${av.border};background:${av.border}">${av.svg}</div>
+    <div class="msg-body">
+      <div class="msg-meta">
+        <span class="msg-model-lbl" style="color:${av.color}">${MODEL_NAMES[winner]}</span>
+        <span class="msg-time">${nowStr()}</span>
+      </div>
+      <div class="bubble streaming" id="active-bubble"></div>
+    </div>`;
+  appendToChat(msgEl);
+  scrollChat();
+
+  const bubble = document.getElementById('active-bubble');
+  let full = '';
+
+  await new Promise(resolve => {
+    fetch('/api/stream', {
+      method:'POST', headers:{'Content-Type':'application/json'},
+      body: JSON.stringify({query, model_id: winner})
+    }).then(res => {
+      const reader = res.body.getReader();
+      const dec = new TextDecoder();
+      let buf = '';
+
+      function pump() {
+        reader.read().then(({done, value}) => {
+          if (done) { finish(); resolve(); return; }
+          buf += dec.decode(value, {stream: true});
+          const lines = buf.split('\n'); buf = lines.pop();
+          lines.forEach(line => {
+            if (!line.startsWith('data: ')) return;
+            try {
+              const ev = JSON.parse(line.slice(6));
+              if (ev.type === 'chunk') { full += ev.content; bubble.innerHTML = renderText(full); scrollChat(); }
+              else if (ev.type === 'done') { finish(); resolve(); }
+            } catch(e) {}
+          });
+          pump();
+        }).catch(() => { finish(); resolve(); });
+      }
+
+      function finish() {
+        bubble.classList.remove('streaming');
+        bubble.innerHTML = renderText(full);
+        bubble.id = '';
+        const elapsed = Date.now() - t0;
+        totalLatency += elapsed;
+        document.getElementById('st-latency').textContent = Math.round(totalLatency / queryCount || elapsed) + ' ms';
+        // Latency badge
+        const meta = msgEl.querySelector('.msg-meta');
+        const lat = document.createElement('span'); lat.className = 'msg-lat'; lat.textContent = elapsed + 'ms';
+        meta.appendChild(lat);
+        scrollChat();
+      }
+      pump();
+    });
+  });
+}
+
+// ─── Arena mode ───────────────────────────────────────────────────
+async function runArena(query) {
+  const loader = document.createElement('div');
+  loader.className = 'message assistant';
+  loader.innerHTML = `
+    <div class="model-avatar" style="border-color:#DDD9FA;background:#EEF0FD">
+      <svg viewBox="0 0 18 18" fill="none"><text x="9" y="13" text-anchor="middle" font-size="11">⚔️</text></svg>
+    </div>
+    <div class="msg-body">
+      <div class="msg-meta"><span class="msg-model-lbl" style="color:#5B3FE8">Arena Mode</span></div>
+      <div class="bubble"><div class="typing-dots"><span></span><span></span><span></span></div></div>
+    </div>`;
+  appendToChat(loader); scrollChat();
+
+  const t0  = Date.now();
+  const res = await fetch('/api/arena', {
+    method:'POST', headers:{'Content-Type':'application/json'},
+    body: JSON.stringify({query, models:['claude','gpt4','gemini','mistral','llama']})
+  });
+  const arenaData = await res.json();
+  loader.remove();
+
+  const elapsed = Date.now() - t0;
+  document.getElementById('st-latency').textContent = elapsed + ' ms';
+
+  const wrap = document.createElement('div');
+  wrap.className = 'arena-wrap';
+
+  const hdr = document.createElement('div');
+  hdr.className = 'arena-header'; hdr.textContent = '⚔️ Arena — All models responded';
+  wrap.appendChild(hdr);
+
+  const grid = document.createElement('div'); grid.className = 'arena-grid';
+
+  Object.entries(arenaData.responses || {}).forEach(([id, r]) => {
+    const av = MODEL_AVATARS[id];
+    const card = document.createElement('div'); card.className = 'arena-card';
+    card.innerHTML = `
+      <div class="arena-card-head">
+        <div class="model-avatar" style="width:24px;height:24px;border-radius:6px;border-color:${av.border};background:${av.border}">${av.svg}</div>
+        <span class="arena-card-name" style="color:${av.color}">${MODEL_NAMES[id]}</span>
+        <span class="arena-card-lat">${r.latency_ms}ms</span>
+      </div>
+      <div class="arena-card-body">${renderText(r.response)}</div>`;
+    grid.appendChild(card);
+  });
+  wrap.appendChild(grid);
+
+  const voteRow = document.createElement('div'); voteRow.className = 'vote-row';
+  const modelIds = Object.keys(arenaData.responses || {});
+  voteRow.innerHTML = `
+    <span class="vote-lbl">Best response:</span>
+    <div class="vote-btns">
+      ${modelIds.map(id => `<button class="vote-btn" onclick="castVote(this,'${id}')">${MODEL_AVATARS[id]?.label} ${id===modelIds[0]?'— try voting!':''}</button>`).join('')}
+    </div>`;
+  wrap.appendChild(voteRow);
+
+  appendToChat(wrap); scrollChat();
+}
+
+function castVote(btn, id) {
+  btn.closest('.vote-btns').querySelectorAll('.vote-btn').forEach(b => b.classList.remove('voted'));
+  btn.classList.add('voted');
+}
+
+// ─── History ──────────────────────────────────────────────────────
+function addHistory(query, data) {
+  const list   = document.getElementById('history-list');
+  const intent = data.intent.primary;
+  const winner = data.routing.winner;
+  const ist    = INTENT_STYLES[intent] || INTENT_STYLES.CONVERSATIONAL;
+  const av     = MODEL_AVATARS[winner];
+
+  const emptyEl = list.querySelector('.empty-history');
+  if (emptyEl) emptyEl.remove();
+
+  const el = document.createElement('div'); el.className = 'history-item';
+  el.innerHTML = `
+    <div class="history-q">${query.slice(0,42)}${query.length>42?'…':''}</div>
+    <div class="history-tags">
+      <span class="htag" style="background:${ist.bg};color:${ist.color}">${ist.emoji} ${intent}</span>
+      <span class="htag" style="background:${av.border};color:${av.color}">${av.label}</span>
+      <span class="htime">${nowStr()}</span>
+    </div>`;
+  list.insertBefore(el, list.firstChild);
+}
+
+// ─── Helpers ──────────────────────────────────────────────────────
+function appendUserMsg(text) {
+  const el = document.createElement('div'); el.className = 'message user';
+  el.innerHTML = `
+    <div class="user-avatar-msg">{{ user.name[0].upper() }}</div>
+    <div class="msg-body">
+      <div class="msg-meta" style="justify-content:flex-end">
+        <span class="msg-time">${nowStr()}</span>
+      </div>
+      <div class="bubble">${esc(text)}</div>
+    </div>`;
+  appendToChat(el); scrollChat();
+}
+
+function appendToChat(el) { document.getElementById('chat-inner').appendChild(el); }
+function scrollChat() { const a = document.getElementById('chat-area'); a.scrollTop = a.scrollHeight; }
+function nowStr() { return new Date().toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'}); }
+function esc(t) { return t.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+
+function renderText(text) {
+  text = text.replace(/```(\w*)\n?([\s\S]*?)```/g, (_, lang, code) =>
+    `<pre><button class="copy-code-btn" onclick="copyCode(this)">Copy</button><code>${esc(code.trim())}</code></pre>`);
+  text = text.replace(/`([^`\n]+)`/g, '<code>$1</code>');
+  text = text.replace(/\*\*([^*]+)\*\*/g, '<strong>$1</strong>');
+  text = text.replace(/\n/g, '<br>');
+  return text;
+}
+
+function copyCode(btn) {
+  const code = btn.nextElementSibling?.textContent || '';
+  navigator.clipboard.writeText(code).then(() => {
+    btn.textContent = '✓ Copied';
+    setTimeout(() => btn.textContent = 'Copy', 1600);
+  });
+}
+</script>
+</body>
+</html>
